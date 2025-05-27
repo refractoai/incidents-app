@@ -14,7 +14,7 @@ import cds.gen.incidentservice.Incidents_;
 public class IncidentsStatusHandler implements EventHandler {
 
     @Before(event = CqnService.EVENT_CREATE, entity = Incidents_.CDS_NAME)
-    public void beforeCreate(Incidents incidents) {
+    public void beforeCreating(Incidents incidents) {
         String title = incidents.getTitle();
         if (title != null && title.toLowerCase().contains("urgent")) {
             incidents.setStatus("high");
