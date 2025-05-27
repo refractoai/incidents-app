@@ -29,31 +29,4 @@ public class ProcessorServiceHandler implements EventHandler {
         this.db = db;
     }
 
-    /*
-     * Change the urgency of an incident to "high" if the title contains the word "urgent"
-     */
-    @Before(event = CqnService.EVENT_CREATE)
-    public void ensureHighUrgencyForIncidentsWithUrgentInTitle(List<Incidents> incidents) {
-        for (Incidents incident : incidents) {
-            if (incident.getTitle().toLowerCase(Locale.ENGLISH).contains("urgent") &&
-                    incident.getUrgencyCode() == null || !incident.getUrgencyCode().equals("H")) {
-                incident.setUrgencyCode("H");
-                logger.info("Adjusted Urgency for incident '{}' to 'HIGH'.", incident.getTitle());
-            }
-
-        }
-    }
-
-    /*
-     * Handler to avoid updating a "closed" incident
-     */
-    @Before(event = CqnService.EVENT_UPDATE)
-    public void ensureNoUpdateOnClosedIncidents(Incidents incident) {
-        Incidents in = db.run(Select.from(Incidents_.class).where(i -> i.ID().eq(incident.getId()))).single(Incidents.class);
-        if (in.getStatusCode().equals("C")) {
-            throw new ServiceException(ErrorStatuses.CONFLICT, "Can't modify a closed incident");
-        }
-
-    }
-
 }
