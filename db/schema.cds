@@ -47,6 +47,7 @@ key code: String enum {
     on_hold = 'H'; 
     resolved = 'R'; 
     closed = 'C'; 
+    rejected = 'X';
 };
 criticality : Integer;
 }
