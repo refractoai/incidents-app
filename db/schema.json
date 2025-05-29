@@ -1,0 +1,258 @@
+{
+  "requires": [
+    "@sap/cds/common"
+  ],
+  "namespace": "sap.capire.incidents",
+  "definitions": {
+    "sap.capire.incidents.Incidents": {
+      "kind": "entity",
+      "includes": [
+        "cuid",
+        "managed"
+      ],
+      "elements": {
+        "customer": {
+          "type": "cds.Association",
+          "target": "sap.capire.incidents.Customers"
+        },
+        "title": {
+          "@title": "Title",
+          "type": "cds.String"
+        },
+        "urgency": {
+          "type": "cds.Association",
+          "target": "sap.capire.incidents.Urgency",
+          "default": {
+            "val": "M"
+          }
+        },
+        "status": {
+          "type": "cds.Association",
+          "target": "sap.capire.incidents.Status",
+          "default": {
+            "val": "N"
+          }
+        },
+        "conversation": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": {
+            "elements": {
+              "ID": {
+                "key": true,
+                "type": "cds.UUID"
+              },
+              "timestamp": {
+                "type": {
+                  "ref": [
+                    "managed",
+                    "createdAt"
+                  ]
+                }
+              },
+              "author": {
+                "type": {
+                  "ref": [
+                    "managed",
+                    "createdBy"
+                  ]
+                }
+              },
+              "message": {
+                "type": "cds.String"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sap.capire.incidents.Customers": {
+      "kind": "entity",
+      "includes": [
+        "managed"
+      ],
+      "elements": {
+        "ID": {
+          "key": true,
+          "type": "cds.String"
+        },
+        "firstName": {
+          "type": "cds.String"
+        },
+        "lastName": {
+          "type": "cds.String"
+        },
+        "name": {
+          "type": "cds.String",
+          "value": {
+            "xpr": [
+              {
+                "ref": [
+                  "firstName"
+                ]
+              },
+              "||",
+              {
+                "val": " "
+              },
+              "||",
+              {
+                "ref": [
+                  "lastName"
+                ]
+              }
+            ]
+          }
+        },
+        "email": {
+          "type": "sap.capire.incidents.EMailAddress"
+        },
+        "phone": {
+          "type": "sap.capire.incidents.PhoneNumber"
+        },
+        "incidents": {
+          "type": "cds.Association",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.capire.incidents.Incidents",
+          "on": [
+            {
+              "ref": [
+                "incidents",
+                "customer"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$self"
+              ]
+            }
+          ]
+        },
+        "creditCardNo": {
+          "@assert.format": "^[1-9]\\d{15}$",
+          "type": "cds.String",
+          "length": 16
+        },
+        "addresses": {
+          "type": "cds.Composition",
+          "cardinality": {
+            "max": "*"
+          },
+          "target": "sap.capire.incidents.Addresses",
+          "on": [
+            {
+              "ref": [
+                "addresses",
+                "customer"
+              ]
+            },
+            "=",
+            {
+              "ref": [
+                "$self"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "sap.capire.incidents.Addresses": {
+      "kind": "entity",
+      "includes": [
+        "cuid",
+        "managed"
+      ],
+      "elements": {
+        "customer": {
+          "type": "cds.Association",
+          "target": "sap.capire.incidents.Customers"
+        },
+        "city": {
+          "type": "cds.String"
+        },
+        "postCode": {
+          "type": "cds.String"
+        },
+        "streetAddress": {
+          "type": "cds.String"
+        }
+      }
+    },
+    "sap.capire.incidents.Status": {
+      "kind": "entity",
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "code": {
+          "key": true,
+          "type": "cds.String",
+          "enum": {
+            "new": {
+              "val": "N"
+            },
+            "assigned": {
+              "val": "A"
+            },
+            "in_process": {
+              "val": "I"
+            },
+            "on_hold": {
+              "val": "H"
+            },
+            "resolved": {
+              "val": "R"
+            },
+            "closed": {
+              "val": "C"
+            }
+          }
+        },
+        "criticality": {
+          "type": "cds.Integer"
+        }
+      }
+    },
+    "sap.capire.incidents.Urgency": {
+      "kind": "entity",
+      "includes": [
+        "sap.common.CodeList"
+      ],
+      "elements": {
+        "code": {
+          "key": true,
+          "type": "cds.String",
+          "enum": {
+            "high": {
+              "val": "H"
+            },
+            "medium": {
+              "val": "M"
+            },
+            "low": {
+              "val": "L"
+            }
+          }
+        }
+      }
+    },
+    "sap.capire.incidents.EMailAddress": {
+      "kind": "type",
+      "type": "cds.String"
+    },
+    "sap.capire.incidents.PhoneNumber": {
+      "kind": "type",
+      "type": "cds.String"
+    }
+  },
+  "meta": {
+    "creator": "CDS Compiler v5.9.4",
+    "flavor": "parsed"
+  },
+  "$version": "2.0"
+}
