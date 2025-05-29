@@ -49,56 +49,56 @@ class IncidentHandlerTest {
     }
 
     @Test
-    void testRemoveTickets_WithOldClosedIncidents() {
+    void testRemoveTicketsGaurav_WithOldClosedIncidents() {
         // Arrange
         when(mockService.run(any())).thenReturn(mockResult);
         when(mockResult.listOf(Incidents.class))
             .thenReturn(Arrays.asList(oldIncident));
 
         // Act
-        handler.removeTickets(mockService);
+        handler.removeTicketsGaurav(mockService);
 
         // Assert
         verify(mockService, times(2)).run(any()); // One for select, one for delete
     }
 
     @Test
-    void testRemoveTickets_WithRecentClosedIncidents() {
+    void testRemoveTicketsGaurav_WithRecentClosedIncidents() {
         // Arrange
         when(mockService.run(any())).thenReturn(mockResult);
         when(mockResult.listOf(Incidents.class))
             .thenReturn(Arrays.asList(recentIncident));
 
         // Act
-        handler.removeTickets(mockService);
+        handler.removeTicketsGaurav(mockService);
 
         // Assert
         verify(mockService, times(1)).run(any()); // Only the select, no delete
     }
 
     @Test
-    void testRemoveTickets_WithNoIncidents() {
+    void testRemoveTicketsGaurav_WithNoIncidents() {
         // Arrange
         when(mockService.run(any())).thenReturn(mockResult);
         when(mockResult.listOf(Incidents.class))
             .thenReturn(Collections.emptyList());
 
         // Act
-        handler.removeTickets(mockService);
+        handler.removeTicketsGaurav(mockService);
 
         // Assert
         verify(mockService, times(1)).run(any()); // Only the select, no delete
     }
 
     @Test
-    void testRemoveTickets_WithMixedIncidents() {
+    void testRemoveTicketsGaurav_WithMixedIncidents() {
         // Arrange
         when(mockService.run(any())).thenReturn(mockResult);
         when(mockResult.listOf(Incidents.class))
             .thenReturn(Arrays.asList(oldIncident, recentIncident));
 
         // Act
-        handler.removeTickets(mockService);
+        handler.removeTicketsGaurav(mockService);
 
         // Assert
         verify(mockService, times(2)).run(any()); // One select, one delete

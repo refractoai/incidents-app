@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class IncidentHandler implements EventHandler {
     
     @After(event = CdsService.EVENT_UPDATE, entity = Incidents_.CDS_NAME)
-    public void removeTickets(CdsService service) {
+    public void removeTicketsGaurav(CdsService service) {
         // Get current timestamp
         Instant now = Instant.now();
         
