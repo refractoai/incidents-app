@@ -16,12 +16,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Locale;
+import com.sap.cds.ql.cqn.CqnUpdate;
 
 @Component
 @ServiceName(ProcessorService_.CDS_NAME)
 public class ProcessorServiceHandler implements EventHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorServiceHandler.class);
+    private static final String STATUS_CLOSED = "C";
+    private static final String STATUS_RESOLVED = "R";
 
     private final PersistenceService db;
 
@@ -29,31 +32,18 @@ public class ProcessorServiceHandler implements EventHandler {
         this.db = db;
     }
 
-    /*
-     * Change the urgency of an incident to "high" if the title contains the word "urgent"
-     */
-    @Before(event = CqnService.EVENT_CREATE)
-    public void ensureHighUrgencyForIncidentsWithUrgentInTitle(List<Incidents> incidents) {
-        for (Incidents incident : incidents) {
-            if (incident.getTitle().toLowerCase(Locale.ENGLISH).contains("urgent") &&
-                    incident.getUrgencyCode() == null || !incident.getUrgencyCode().equals("H")) {
-                incident.setUrgencyCode("H");
-                logger.info("Adjusted Urgency for incident '{}' to 'HIGH'.", incident.getTitle());
-            }
-
-        }
-    }
-
-    /*
-     * Handler to avoid updating a "closed" incident
-     */
     @Before(event = CqnService.EVENT_UPDATE)
-    public void ensureNoUpdateOnClosedIncidents(Incidents incident) {
-        Incidents in = db.run(Select.from(Incidents_.class).where(i -> i.ID().eq(incident.getId()))).single(Incidents.class);
-        if (in.getStatusCode().equals("C")) {
-            throw new ServiceException(ErrorStatuses.CONFLICT, "Can't modify a closed incident");
+    public void beforeUpdate(CqnUpdate update) {
+        String status = db.run(Select.from(Incidents_.class)
+                .where(i -> i.ID().eq(update.ref().getKeyValues().get(0).toString())))
+                .single(Incidents_.class)
+                .getStatus_code();
+
+        if (STATUS_CLOSED.equals(status) || STATUS_RESOLVED.equals(status)) {
+            String statusText = STATUS_CLOSED.equals(status) ? "closed" : "resolved";
+            logger.error("Cannot update a {} incident", statusText);
+            throw new ServiceException(ErrorStatuses.BAD_REQUEST, 
+                    String.format("Error: Cannot update a %s ticket", statusText));
         }
-
     }
-
 }

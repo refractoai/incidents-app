@@ -59,5 +59,14 @@ key code: String enum {
 };
 }
 
+/**
+* Track status changes for incidents
+*/
+entity StatusHistory : cuid, managed {
+  incident : Association to Incidents;
+  oldStatus : Association to Status;
+  newStatus : Association to Status;
+}
+
 type EMailAddress : String;
 type PhoneNumber : String;
