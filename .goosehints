@@ -1,0 +1,10 @@
+Begin by parsing and caching all `.java`, and service-related files using `parse_and_cache_incremental` to generate their ASTs. 
+Separately, load the compiled CDS model from `db/cds.json`. 
+Treat this JSON as the semantic representation of the CDS definitions (entities, types, associations, services). 
+Next, use `generate_and_cache_enhanced_asg` on the parsed code to build a semantic graph that includes dependencies, scopes, and relationships between handlers, services, and modules.
+Merge the CDS semantic model (cds.json) into the ASG as an external schema, mapping:  
+- Entities to their respective service handlers  
+- Types to their corresponding usages  
+- Associations to related entity lookups or joins  
+- This unified ASG should serve as the basis for code generation, helping infer which handlers, CRUD logic, or boilerplate need to be created or extended.
+- Use `ast_diff_and_cache` to validate modifications and ensure alignment with both AST semantics and CDS model logic.
